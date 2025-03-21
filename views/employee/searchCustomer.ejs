@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Customer</title>
+  <style>
+    /* Dark Theme Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #1a1a1a;
+      color: #1a1a1a;;
+      margin: 0;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+  
+    .search-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  
+    h1 {
+      color: #00ff88;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+  
+    .search-form {
+      background: #2d2d2d;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+    }
+  
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem;
+      background: #3d3d3d;
+      border: 1px solid #4d4d4d;
+      border-radius: 4px;
+      color: #1a1a1a;;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+  
+    input[type="text"]:focus {
+      border-color: #00ff88;
+      outline: none;
+      box-shadow: 0 0 0 2px #00ff8833;
+    }
+  
+    button[type="submit"] {
+      background: #00ff88;
+      color: #1a1a1a;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+  
+    button[type="submit"]:hover {
+      background: #00cc66;
+      transform: translateY(-1px);
+    }
+  
+    .message {
+      background: #1a472a;
+      color: #00ff88;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+      border: 1px solid #00ff8855;
+      text-align: center;
+    }
+  
+    .results {
+      background: #2d2d2d;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+  
+    .customer-card {
+      background: #3d3d3d;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      border: 1px solid #4d4d4d;
+    }
+  
+    .customer-card h3 {
+      color: #00ff88;
+      margin-top: 0;
+    }
+  
+    .customer-card p {
+      color: #cccccc;
+      margin: 0.5rem 0;
+    }
+  
+    .customer-card a {
+      color: #00ff88;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+  
+    .customer-card a:hover {
+      text-decoration: underline;
+    }
+  
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .search-form {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <h1>Search Customer</h1>
+    
+    <form class="search-form" action="/employee/search-customer" method="GET">
+      <input 
+        type="text" 
+        name="query" 
+        placeholder="Search by Account No, Mobile, Aadhaar, or Name"
+        value="<%= typeof query !== 'undefined' ? query : '' %>"
+      >
+      <button type="submit">Search</button>
+    </form>
+
+    <% if (typeof message !== 'undefined' && message) { %>
+      <div class="message"><%= message %></div>
+    <% } %>
+
+    <% if (typeof customers !== 'undefined' && customers.length > 0) { %>
+      <div class="results">
+        <h2>Search Results for "<%= typeof query !== 'undefined' ? query : '' %>"</h2>
+        <% customers.forEach(customer => { %>
+          <div class="customer-card">
+            <h3><%= customer.firstName %> <%= customer.lastName %></h3>
+            <p>Account: <%= customer.accountNumber %></p>
+            <p>Mobile: <%= customer.mobileNumber %></p>
+            <p>Aadhaar: <%= customer.adhaarNumber %></p>
+            <a href="/employee/manage-account/<%= customer._id %>">Manage Account</a>
+          </div>
+        <% }) %>
+      </div>
+    <% } else if (typeof query !== 'undefined' && query) { %>
+      <div class="message">No customers found for "<%= query %>"</div>
+    <% } %>
+  </div>
+</body>
+</html>

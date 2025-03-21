@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Accounts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ff88;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #00ff88;
+      color: #1a1a1a;
+    }
+    a {
+      color: #00ff88;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Accounts</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Account Number</th>
+        <th>Customer ID</th>
+        <th>Mobile Number</th>
+        <th>Balance</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% accounts.forEach(account => { %>
+        <tr>
+          <td><%= account.accountNumber %></td>
+          <td><%= account.customerId %></td>
+          <td><%= account.mobileNumber %></td>
+          <td><%= account.balance %></td>
+          <td><a href="/employee/manage-account/<%= account._id %>">Manage</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
