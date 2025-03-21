@@ -70,43 +70,67 @@ exports.getManageAccount = async (req, res) => {
   }
 };
 
-// Deposit Money
+// Add proper error handling to deposit
+const validateAmount = (amount) => {
+  const numericAmount = parseFloat(amount);
+  return !isNaN(numericAmount) && numericAmount > 0;
+};
+
 exports.deposit = async (req, res) => {
   try {
+
+    console.log('Deposit Request Body:', req.body); // Add this line
     const account = await Account.findById(req.params.id);
-    if (!account) return res.status(404).send('Account not found');
+    console.log('Raw Amount:', req.body.amount); 
+   
+    if (!account) return res.status(404).json({ error: "Account not found" });
+
+    if (!validateAmount(req.body.amount)) {
+      return res.status(400).json({ error: "Invalid amount. Please enter a positive number" });
+    }
 
     const amount = parseFloat(req.body.amount);
-    if (amount <= 0) return res.status(400).send('Invalid deposit amount');
-
     account.balance += amount;
     await account.save();
 
-    res.json({ message: `Deposited ₹${amount}`, balance: account.balance });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error processing deposit');
+    res.json({ 
+      success: true,
+      message: `Deposited ₹${amount.toFixed(2)}`,
+      balance: account.balance.toFixed(2)
+    });
+  } catch (error) {
+    console.error("Deposit error:", error);
+    res.status(500).json({ error: "Server error during deposit" });
   }
 };
 
-// Withdraw Money
 exports.withdraw = async (req, res) => {
   try {
     const account = await Account.findById(req.params.id);
-    if (!account) return res.status(404).send('Account not found');
+    if (!account) return res.status(404).json({ error: "Account not found" });
+
+    if (!validateAmount(req.body.amount)) {
+      return res.status(400).json({ error: "Invalid amount. Please enter a positive number" });
+    }
 
     const amount = parseFloat(req.body.amount);
-    if (amount <= 0 || amount > account.balance) {
-      return res.status(400).json({ error: 'Invalid withdrawal amount' });
+    if (amount > account.balance) {
+      return res.status(400).json({ 
+        error: `Insufficient funds. Available: ₹${account.balance.toFixed(2)}`
+      });
     }
 
     account.balance -= amount;
     await account.save();
 
-    res.json({ message: `Withdrew ₹${amount}`, balance: account.balance });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error processing withdrawal');
+    res.json({ 
+      success: true,
+      message: `Withdrew ₹${amount.toFixed(2)}`,
+      balance: account.balance.toFixed(2)
+    });
+  } catch (error) {
+    console.error("Withdrawal error:", error);
+    res.status(500).json({ error: "Server error during withdrawal" });
   }
 };
 
@@ -163,3 +187,8 @@ exports.getAllAccounts = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+
+
+
+

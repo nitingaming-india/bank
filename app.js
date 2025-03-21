@@ -20,7 +20,9 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 
-
+// Add these before routes
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse form data
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));

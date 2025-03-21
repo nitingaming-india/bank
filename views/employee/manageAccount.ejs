@@ -85,6 +85,8 @@
       padding: 5px;
       background: #3d3d3d;
     }
+
+    
   </style>
 </head>
 <body>
@@ -143,5 +145,49 @@
     <button onclick="withdraw()">Withdraw</button>
     <button onclick="checkBalance()">Check Balance</button>
   </div>
+
+  <script>
+    async function handleTransaction(url, type) {
+    const input = prompt(`Enter ${type} amount:`);
+    
+    // Allow commas and currency symbols in input
+    if (!input || !/^[₹$]?[0-9,]*\.?[0-9]+$/.test(input)) {
+      alert('Please enter a valid amount (e.g., 1000, ₹500.50, or 2,000)');
+      return;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: input })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || `${type} failed`);
+      }
+
+      alert(`${type} Success!\n${data.message}\nNew Balance: ₹${data.balance}`);
+      location.reload();
+      
+    } catch (error) {
+      alert(`${type} Error: ${error.message}`);
+    }
+  }
+  
+    function deposit() {
+      handleTransaction(`/employee/deposit/<%= account._id %>`, 'Deposit');
+    }
+  
+    function withdraw() {
+      handleTransaction(`/employee/withdraw/<%= account._id %>`, 'Withdrawal');
+    }
+  
+    function checkBalance() {
+      alert(`Current Balance: ₹<%= account.balance.toFixed(2) %>`);
+    }
+  </script>
 </body>
 </html>

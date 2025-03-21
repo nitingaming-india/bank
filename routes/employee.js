@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { isEmployee } = require('../middleware/roleMiddleware');
+const { sanitizeNumbers } = require('../middleware/sanitize');
 const employeeController = require('../controllers/employeeController');
 const upload = require('../config/multer');
 
@@ -20,15 +21,20 @@ router.get('/all-accounts', isEmployee, employeeController.getAllAccounts);
 // Manage Account
 router.get('/manage-account/:id', isEmployee, employeeController.getManageAccount);
 
-// Deposit
-router.post('/deposit/:id', isEmployee, employeeController.deposit);
+// Transaction Routes
+router.post('/deposit/:id', 
+  isEmployee, 
+  sanitizeNumbers, 
+  employeeController.deposit
+);
 
-// Withdraw
-router.post('/withdraw/:id', isEmployee, employeeController.withdraw);
+router.post('/withdraw/:id', 
+  isEmployee, 
+  sanitizeNumbers, 
+  employeeController.withdraw
+);
 
 // Search Customer
 router.get('/search-customer', isEmployee, employeeController.searchCustomer);
-
-
 
 module.exports = router;
