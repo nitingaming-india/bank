@@ -15,7 +15,12 @@ const accountSchema = new mongoose.Schema({
     cardNumber: String,
     expiryDate: Date
   },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+
+  transactions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Transaction'
+  }]
 });
 
 module.exports = mongoose.model('Account', accountSchema);

@@ -189,5 +189,85 @@
       alert(`Current Balance: ₹<%= account.balance.toFixed(2) %>`);
     }
   </script>
+
+<div class="transaction-history">
+  <h2>Transaction History</h2>
+  
+  <% if (account.transactions && account.transactions.length > 0) { %>
+    <div class="transaction-list">
+      <% account.transactions.forEach(txn => { %>
+        <div class="transaction-card <%= txn.type %>">
+          <div class="txn-header">
+            <span class="txn-id"><%= txn.transactionId %></span>
+            <span class="txn-type"><%= txn.type.toUpperCase() %></span>
+          </div>
+          <div class="txn-details">
+            <p>Amount: ₹<%= txn.amount.toFixed(2) %></p>
+            <p>Date: <%= new Date(txn.timestamp).toLocaleDateString('en-IN') %></p>
+            <p>Time: <%= new Date(txn.timestamp).toLocaleTimeString('en-IN') %></p>
+            <p>Initiated by: <%= txn.initiator.name %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p class="no-transactions">No transactions found</p>
+  <% } %>
+</div>
+
+<style>
+  .transaction-history {
+    margin-top: 2rem;
+    background: #2d2d2d;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .transaction-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .transaction-card {
+    background: #3d3d3d;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid;
+  }
+
+  .transaction-card.deposit {
+    border-color: #00ff88;
+  }
+
+  .transaction-card.withdrawal {
+    border-color: #ff4444;
+  }
+
+  .txn-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .txn-id {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .txn-type {
+    font-weight: bold;
+  }
+
+  .txn-details p {
+    margin: 0.3rem 0;
+    color: #ccc;
+  }
+
+  .no-transactions {
+    color: #666;
+    text-align: center;
+    padding: 1rem;
+  }
+</style>
 </body>
 </html>
