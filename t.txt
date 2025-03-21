@@ -5,4 +5,4 @@ pan card if not pan then a form 60 etc
 - when i enter any detail like debit card number, account number, mobile, adhaar etc all the customer infor shoudl appear on my screen along with the account form submitted during the opening, account balance and much more
 - deposit and withdraw
 
-changed
+this is changed
