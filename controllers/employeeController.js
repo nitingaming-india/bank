@@ -1,4 +1,5 @@
 const Account = require('../models/Account');
+const Transaction = require('../models/Transaction');
 
 // Employee Dashboard
 exports.getDashboard = (req, res) => {
@@ -154,7 +155,6 @@ const validateAmount = (amount) => {
 // };
 
 
-const Transaction = require('../models/Transaction');
 
 // Helper function to create transaction
 const createTransaction = async (type, amount, initiator, account) => {
@@ -162,6 +162,7 @@ const createTransaction = async (type, amount, initiator, account) => {
     type,
     amount,
     initiator,
+
     account: account._id
   });
   await transaction.save();
@@ -191,12 +192,14 @@ exports.deposit = async (req, res) => {
     account.transactions.push(transaction._id);
     await account.save();
 
-    res.json({
-      success: true,
-      transactionId: transaction.transactionId,
-      newBalance: account.balance.toFixed(2),
-      timestamp: transaction.timestamp.toLocaleString('en-IN')
-    });
+
+res.json({
+  success: true,
+  message: `Deposited ₹${amount.toFixed(2)}`,
+  balance: account.balance.toFixed(2),
+  transactionId: transaction.transactionId
+});
+
 
   } catch (error) {
     console.error("Deposit error:", error);
@@ -233,12 +236,13 @@ exports.withdraw = async (req, res) => {
     account.transactions.push(transaction._id);
     await account.save();
 
-    res.json({
-      success: true,
-      transactionId: transaction.transactionId,
-      newBalance: account.balance.toFixed(2),
-      timestamp: transaction.timestamp.toLocaleString('en-IN')
-    });
+// In both deposit and withdrawal responses:
+res.json({
+  success: true,
+  message: `Withdrew ₹${amount.toFixed(2)}`,
+  balance: account.balance.toFixed(2),
+  transactionId: transaction.transactionId
+});
 
   } catch (error) {
     console.error("Withdrawal error:", error);

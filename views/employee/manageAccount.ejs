@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Account</title>
   <style>
-    /* Dark Theme Styles */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #1a1a1a;
@@ -13,6 +12,7 @@
       margin: 0;
       padding: 2rem;
       min-height: 100vh;
+      position: relative;
     }
 
     h1 {
@@ -20,6 +20,22 @@
       text-align: center;
       margin-bottom: 2rem;
     }
+
+    .customer-avatar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .customer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
     .account-info {
       background: #2d2d2d;
@@ -86,10 +102,118 @@
       background: #3d3d3d;
     }
 
-    
+    .debit-card {
+      background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 20px;
+      position: relative;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid #4d4d4d;
+      overflow: hidden;
+    }
+
+    .debit-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 14px;
+      z-index: -1;
+      background: linear-gradient(45deg, #00ff88, #00cc66);
+    }
+
+    .card-chip {
+      width: 40px;
+      margin-bottom: 1rem;
+    }
+
+    .card-number {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .card-expiry {
+      display: flex;
+      gap: 20px;
+    }
+
+    .card-expiry div span:first-child {
+      font-size: 0.8rem;
+      color: #ccc;
+    }
+
+    .visa-logo {
+      position: absolute;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      width: 60px;
+    }
+
+    .transaction-history {
+      margin-top: 2rem;
+      background: #2d2d2d;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    .transaction-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .transaction-card {
+      background: #3d3d3d;
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid;
+    }
+
+    .transaction-card.deposit {
+      border-color: #00ff88;
+    }
+
+    .transaction-card.withdrawal {
+      border-color: #ff4444;
+    }
+
+    .txn-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .txn-id {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .txn-type {
+      font-weight: bold;
+    }
+
+    .txn-details p {
+      margin: 0.3rem 0;
+      color: #ccc;
+    }
+
+    .no-transactions {
+      color: #666;
+      text-align: center;
+      padding: 1rem;
+    }
   </style>
 </head>
 <body>
+  <div class="customer-avatar">
+    <img src="../../<%= account.customerPhoto %>" alt="Customer Photo">
+  </div>
+
   <h1>Manage Account</h1>
   
   <div class="account-info">
@@ -128,14 +252,32 @@
       ₹<%= account.balance.toFixed(2) %>
     </div>
 
+    <% if (account.debitCard) { %>
+      <div class="debit-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/2331/2331966.png" class="card-chip" alt="Chip">
+        <div class="card-number">
+          <%= account.debitCard.cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ') %>
+        </div>
+        <div class="card-expiry">
+          <div>
+            <span>VALID THRU</span><br>
+            <%= new Date(account.debitCard.expiryDate).toLocaleDateString('en-IN', 
+                 { month: '2-digit', year: '2-digit' }).replace('/', '/') %>
+          </div>
+        </div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" 
+             class="visa-logo" alt="Visa">
+      </div>
+    <% } %>
+
     <div class="document-images">
       <div>
         <h3>Account Opening Form</h3>
         <img src="../../<%= account.accountOpeningFormImage %>" alt="Account Form">
       </div>
       <div>
-        <h3>Customer Photo</h3>
-        <img src="../../<%= account.customerPhoto %>" alt="Customer Photo">
+        <!-- <h3>Customer Photo</h3>
+        <img src="../../<%= account.customerPhoto %>" alt="Customer Photo"> -->
       </div>
     </div>
   </div>
@@ -148,35 +290,33 @@
 
   <script>
     async function handleTransaction(url, type) {
-    const input = prompt(`Enter ${type} amount:`);
-    
-    // Allow commas and currency symbols in input
-    if (!input || !/^[₹$]?[0-9,]*\.?[0-9]+$/.test(input)) {
-      alert('Please enter a valid amount (e.g., 1000, ₹500.50, or 2,000)');
-      return;
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: input })
-      });
-
-      const data = await response.json();
+      const input = prompt(`Enter ${type} amount:`);
       
-      if (!response.ok) {
-        throw new Error(data.error || `${type} failed`);
+      if (!input || !/^[₹$]?[0-9,]*\.?[0-9]+$/.test(input)) {
+        alert('Please enter a valid amount (e.g., 1000, ₹500.50, or 2,000)');
+        return;
       }
 
-      alert(`${type} Success!\n${data.message}\nNew Balance: ₹${data.balance}`);
-      location.reload();
-      
-    } catch (error) {
-      alert(`${type} Error: ${error.message}`);
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: input })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || `${type} failed`);
+        }
+
+        alert(`${type} Success!\n${data.message}\nNew Balance: ₹${data.balance}`);
+        location.reload();
+      } catch (error) {
+        alert(`${type} Error: ${error.message}`);
+      }
     }
-  }
-  
+    
     function deposit() {
       handleTransaction(`/employee/deposit/<%= account._id %>`, 'Deposit');
     }
@@ -190,84 +330,29 @@
     }
   </script>
 
-<div class="transaction-history">
-  <h2>Transaction History</h2>
-  
-  <% if (account.transactions && account.transactions.length > 0) { %>
-    <div class="transaction-list">
-      <% account.transactions.forEach(txn => { %>
-        <div class="transaction-card <%= txn.type %>">
-          <div class="txn-header">
-            <span class="txn-id"><%= txn.transactionId %></span>
-            <span class="txn-type"><%= txn.type.toUpperCase() %></span>
+  <div class="transaction-history">
+    <h2>Transaction History</h2>
+    
+    <% if (account.transactions && account.transactions.length > 0) { %>
+      <div class="transaction-list">
+        <% account.transactions.forEach(txn => { %>
+          <div class="transaction-card <%= txn.type %>">
+            <div class="txn-header">
+              <span class="txn-id"><%= txn.transactionId %></span>
+              <span class="txn-type"><%= txn.type.toUpperCase() %></span>
+            </div>
+            <div class="txn-details">
+              <p>Amount: ₹<%= txn.amount.toFixed(2) %></p>
+              <p>Date: <%= new Date(txn.timestamp).toLocaleDateString('en-IN') %></p>
+              <p>Time: <%= new Date(txn.timestamp).toLocaleTimeString('en-IN') %></p>
+              <p>Initiated by: <%= txn.initiator?.firstName %> <%= txn.initiator?.lastName %></p>
+            </div>
           </div>
-          <div class="txn-details">
-            <p>Amount: ₹<%= txn.amount.toFixed(2) %></p>
-            <p>Date: <%= new Date(txn.timestamp).toLocaleDateString('en-IN') %></p>
-            <p>Time: <%= new Date(txn.timestamp).toLocaleTimeString('en-IN') %></p>
-            <p>Initiated by: <%= txn.initiator.name %></p>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <p class="no-transactions">No transactions found</p>
-  <% } %>
-</div>
-
-<style>
-  .transaction-history {
-    margin-top: 2rem;
-    background: #2d2d2d;
-    padding: 1.5rem;
-    border-radius: 8px;
-  }
-
-  .transaction-list {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .transaction-card {
-    background: #3d3d3d;
-    padding: 1rem;
-    border-radius: 6px;
-    border-left: 4px solid;
-  }
-
-  .transaction-card.deposit {
-    border-color: #00ff88;
-  }
-
-  .transaction-card.withdrawal {
-    border-color: #ff4444;
-  }
-
-  .txn-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-  }
-
-  .txn-id {
-    color: #888;
-    font-size: 0.9rem;
-  }
-
-  .txn-type {
-    font-weight: bold;
-  }
-
-  .txn-details p {
-    margin: 0.3rem 0;
-    color: #ccc;
-  }
-
-  .no-transactions {
-    color: #666;
-    text-align: center;
-    padding: 1rem;
-  }
-</style>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="no-transactions">No transactions found</p>
+    <% } %>
+  </div>
 </body>
 </html>

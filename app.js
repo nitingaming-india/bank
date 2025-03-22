@@ -34,7 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Session configuration
 app.use(session({
-  secret: 'your-secret-key',
+  secret: 'NITINKUMAR639638982007ISSECRETKODECODEKARKEBATAO',
   resave: false,
   saveUninitialized: false,
 }));

@@ -32,13 +32,22 @@ const transactionSchema = new mongoose.Schema({
 });
 
 // Generate unique transaction ID before saving
-transactionSchema.pre('save', function(next) {
+transactionSchema.pre('validate', async function(next) {
   if (!this.transactionId) {
-    const datePart = Date.now().toString(36);
-    const randPart = Math.random().toString(36).substr(2, 6);
-    this.transactionId = `TXN-${datePart}-${randPart}`.toUpperCase();
+    let isUnique = false;
+    while (!isUnique) {
+      const datePart = Date.now().toString(36);
+      const randPart = Math.random().toString(36).substr(2, 6);
+      const candidateId = `TXN-${datePart}-${randPart}`.toUpperCase();
+      
+      // Check if ID already exists
+      const exists = await this.constructor.findOne({ transactionId: candidateId });
+      if (!exists) {
+        this.transactionId = candidateId;
+        isUnique = true;
+      }
+    }
   }
   next();
 });
-
 module.exports = mongoose.model('Transaction', transactionSchema);

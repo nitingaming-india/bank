@@ -3,10 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://sci:nitinku8m@sci.rurzt.mongodb.net/?retryWrites=true&w=majority&appName=SCI', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Error connecting to MongoDB:', err));
 
